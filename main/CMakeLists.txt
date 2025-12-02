@@ -1,2 +1,2 @@
-idf_component_register(SRCS "my_wifi.c" "SmartIrrigation.c"
+idf_component_register(SRCS "SmartIrrigation.c"
                     INCLUDE_DIRS ".")
