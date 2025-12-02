@@ -26,8 +26,9 @@ This project utilizes the **ESP32-S3 microcontroller** to automatically irrigate
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/YOUR-USERNAME/esp32-smart-irrigation.git](https://github.com/YOUR-USERNAME/esp32-smart-irrigation.git)
-cd esp32-smart-irrigation
+git clone [https://github.com/RAIZ-Zzz/Smart-Irrigation-system.git](https://github.com/RAIZ-Zzz/Smart-Irrigation-system.git)
+cd Smart-Irrigation-system
+```
 
 ### 2. Commit name rule:
 - feat (Feature): 
