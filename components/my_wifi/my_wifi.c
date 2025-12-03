@@ -1,5 +1,3 @@
-#include "my_wifi.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -14,10 +12,12 @@
 #include "esp_event.h"
 #include "esp_err.h"
 
+#include "my_wifi.h"
+
 #define TAG "wifi"
 
-static SemaphoreHandle_t s_wifi_connect_sem =NULL;
-
+SemaphoreHandle_t s_wifi_connect_sem = NULL;
+SemaphoreHandle_t s_sntp_init_sem = NULL;
 
 void wifi_event_handle(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
@@ -33,24 +33,21 @@ void wifi_event_handle(void* event_handler_arg, esp_event_base_t event_base, int
                 break;
             case WIFI_EVENT_STA_DISCONNECTED:
                 esp_wifi_connect();
-                ESP_LOGI(TAG,"esp32 connect to ap failed! retry");
+                ESP_LOGI(TAG,"esp32 reconnecting...");
                 break;
             default:
                 break;
-
         }
     }
-    else if(event_base == IP_EVENT)
+    else if(event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
-        switch(event_id)
-        {
-            case IP_EVENT_STA_GOT_IP:
-                ESP_LOGI(TAG, "esp32 get ip address" );
-                xSemaphoreGive(s_wifi_connect_sem);
-                break;
-        }
+        ESP_LOGI(TAG, "esp32 get ip address");
+        ESP_LOGI(TAG,"esp32 wifi configuration done");
+        
+        xSemaphoreGive(s_wifi_connect_sem);
     }
 }
+
 
 void wifi_init(const char* SSID, const char* PASSWORD)
 {
@@ -65,8 +62,6 @@ void wifi_init(const char* SSID, const char* PASSWORD)
     esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-
-    s_wifi_connect_sem = xSemaphoreCreateBinary();
 
     esp_event_handler_register(WIFI_EVENT,ESP_EVENT_ANY_ID,wifi_event_handle,NULL);
     esp_event_handler_register(IP_EVENT,IP_EVENT_STA_GOT_IP,wifi_event_handle,NULL);
@@ -83,7 +78,6 @@ void wifi_init(const char* SSID, const char* PASSWORD)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA,&wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-    xSemaphoreTake(s_wifi_connect_sem,portMAX_DELAY);
-    ESP_LOGI(TAG,"esp32 wifi configuration done");
+
 }
 
