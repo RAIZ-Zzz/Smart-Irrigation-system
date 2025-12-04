@@ -29,8 +29,8 @@ void app_main(void)
     xSemaphoreTake(s_wifi_connect_sem,portMAX_DELAY);
     mqtt_start(MQTT_TOPIC_SUBSCRIBE, MQTT_ADDRESS, MQTT_CLIENTID, MQTT_USERNAME, MQTT_PASSWORD);//mqtt init
 
-    xTaskCreate(time_info_send,"time info publish",2048,(void*)MQTT_TOPIC_PUBLISH,3,NULL);
-    xTaskCreate(sntp_reconnect,"sntp reconnect",2048,NULL,3,NULL);
+    xTaskCreate(time_info_send,"time info publish",4096,(void*)MQTT_TOPIC_PUBLISH,3,NULL);
+    xTaskCreate(sntp_reconnect,"sntp reconnect",4096,NULL,3,NULL);
 
     
 }
