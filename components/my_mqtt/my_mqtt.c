@@ -159,3 +159,31 @@ void time_report(const char*MQTT_TOPIC1)
     esp_mqtt_client_publish(mqtt_handle,MQTT_TOPIC1,strftime_buf,strlen(strftime_buf),1,0);
 }
 
+void time_info_send(void* Param)//if receive message do time report
+{   
+    const char* topic = (const char*)Param;
+    while(1)
+    {
+        xSemaphoreTake(s_mqtt_publish_sem,portMAX_DELAY);
+        int i = 0;
+        while(i<5)
+        {
+            time_report(topic);  
+            i++;
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+        ESP_LOGI("TASK", "Time report task completed");
+    }
+    
+
+}
+
+void sntp_reconnect(void* Param)// reconnect sntp after reconnect wifi
+{
+    while(1)
+    {
+        xSemaphoreTake(s_sntp_init_sem, portMAX_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        time_sync_init();
+    }
+}

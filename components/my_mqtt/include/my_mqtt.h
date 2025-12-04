@@ -10,4 +10,9 @@ void mqtt_publish(char* MESSAGE, char* MQTT_TOPIC1);//mqtt send json message
 void time_sync_init();//time sync initialize
 
 void time_report(const char*MQTT_TOPIC1);// time report
+
+void time_info_send(void* Param);
+
+void sntp_reconnect(void* Param);
+
 #endif
